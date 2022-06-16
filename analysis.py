@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-file = "021_17-04-2022_003_DevB2_DC_IV(H)_baseT_I_16-17_V_21-19_105deg_fieldsweep_200mT_to_-200mT_4mT_steps.dat"
+file = "036_31-05-2022_001_DevB1_DC_IV(H)_afterwarmup_IP_baseT_-250_to_250mT_(80deg)_2mT_steps.dat"
 exclude = [i for i, line in enumerate(open(file)) if line.startswith("M")]
 df = pd.read_csv(file, sep="\t", skiprows=exclude[1:])
 
@@ -40,9 +40,9 @@ def get_sign_of_series(series: List):
 #  and sign of gradient of current
 grouped_data = df.groupby(
     [
-        round(df[mag_field], mag_rounding_digits),
-        round(df[angle], angle_rounding_digits),
-        get_sign_of_series(np.gradient(df[current])),
+         round(df[mag_field], mag_rounding_digits),
+         round(df[angle], angle_rounding_digits),
+         get_sign_of_series(np.gradient(df[current])),
     ]
 )
 # print("Keys: ", grouped_data.groups.keys())
@@ -82,8 +82,8 @@ for i, (key, data) in enumerate(grouped_data):
     ic = np.average(
         data[np.gradient(data[voltage], data[current]) > 0.3][current]
     )
-    icp = ic if key[2] > 0 else None
-    icn = ic if key[2] < 0 else None
+    icp = float(max_current) if key[2] > 0 else None
+    icn = float(max_current) if key[2] < 0 else None
     mask = (output[output_columns[0]] == key[0]) & (
         output[output_columns[1]] == key[1]
     )
