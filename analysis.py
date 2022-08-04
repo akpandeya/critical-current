@@ -1,10 +1,11 @@
 from fileinput import filename
+import pdb
 from typing import List
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-file = "036_31-05-2022_001_DevB1_DC_IV(H)_afterwarmup_IP_baseT_-250_to_250mT_(80deg)_2mT_steps.dat"
+file = "030_DevB1_DC_IV_BaseT_I_12-13_V_21-15_[20_to_-20mT]_[0deg]_OOP_Y-axis_70uT_steps_afterZ-sweep(sameside_config).dat"
 exclude = [i for i, line in enumerate(open(file)) if line.startswith("M")]
 df = pd.read_csv(file, sep="\t", skiprows=exclude[1:])
 
@@ -40,9 +41,9 @@ def get_sign_of_series(series: List):
 #  and sign of gradient of current
 grouped_data = df.groupby(
     [
-         round(df[mag_field], mag_rounding_digits),
-         round(df[angle], angle_rounding_digits),
-         get_sign_of_series(np.gradient(df[current])),
+        round(df[mag_field], mag_rounding_digits),
+        round(df[angle], angle_rounding_digits),
+        get_sign_of_series(np.gradient(df[current])),
     ]
 )
 # print("Keys: ", grouped_data.groups.keys())
@@ -70,6 +71,8 @@ for i, (key, data) in enumerate(grouped_data):
         np.gradient(data[voltage], data[current]) == max_grad_value
     ][current]
     current_label = f"Ic{'+' if key[2] > 0 else '-'}"
+    if len(max_current) > 1:
+        max_current = np.average(max_current)
     ax2.text(
         max_current,
         max_grad_value,
